@@ -36,10 +36,12 @@ jobs:
         else
           echo "BUILD_PATH=./dist/${{ env.PROJECT_NAME }}/browser" >> $GITHUB_ENV
         fi
+    - name: Set combined branch and repository path
+      run: echo "REPO_BRANCH_PATH=${{ github.ref_name }}/${{ github.event.repository.name }}" >> $GITHUB_ENV
     - name: Build project with dynamic base-href
-      run: npm run build -- --base-href "/${{ github.event.repository.name }}/"
+      run: npm run build -- --base-href "/${{ env.REPO_BRANCH_PATH }}/"
     - name: Update Resource Paths
-      run: find ${{ env.BUILD_PATH }} -type f -name '*main*.js' -exec sed -i -e "s|/assets|/${{ github.event.repository.name }}/assets|g" -e "s|url('/assets|url('/${{ github.event.repository.name }}/assets|g" {} +
+      run: find ${{ env.BUILD_PATH }} -type f -name '*main*.js' -exec sed -i -e "s|/assets|/${{ env.REPO_BRANCH_PATH }}/assets|g" -e "s|url('/assets|url('/${{ env.REPO_BRANCH_PATH }}/assets|g" {} +
     - name: Upload build artifact to GitHub Pages
       uses: actions/upload-pages-artifact@v1
       with:
